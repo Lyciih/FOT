@@ -9,6 +9,10 @@
 #include <array>
 #include <memory>
 #include <sstream>
+#include <cxxopts.hpp>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 
 tesseract::TessBaseAPI Tess_api;
 
@@ -95,23 +99,6 @@ std::string gtrans(const std::string& text,
 
 
 
-/*
-static uint8_t otsu_thresh(const uint32_t hist[256], uint64_t total, double* out_var=nullptr){
-    uint64_t sum=0; for(int i=0;i<256;++i) sum += (uint64_t)i*hist[i];
-    uint64_t wB=0, sumB=0; double maxVar=0; int thr=127;
-    for(int t=0;t<256;++t){
-        wB += hist[t]; if(!wB) continue;
-        uint64_t wF = total - wB; if(!wF) break;
-        sumB += (uint64_t)t*hist[t];
-        double mB = (double)sumB / wB;
-        double mF = (double)(sum - sumB) / wF;
-        double var = (double)wB*(double)wF*(mB-mF)*(mB-mF);
-        if (var > maxVar){ maxVar = var; thr = t; }
-    }
-    if(out_var) *out_var = maxVar;
-    return (uint8_t)thr;
-}
-*/
 
 
 std::string ocr_from_xcb_data(uint8_t *data, int w, int h, int stride, int bpp, int dpi) {
@@ -128,62 +115,6 @@ std::string ocr_from_xcb_data(uint8_t *data, int w, int h, int stride, int bpp, 
 	}
 	
 	Tess_api.SetImage(rgb.data(), w, h, 3, w*3);
-
-
-	/*
-	// 1) 為 B/G/R 建直方圖，分別算 Otsu，選分離度最佳的通道
-    uint32_t histB[256]={0}, histG[256]={0}, histR[256]={0};
-    for (int y=0; y<h; ++y){
-        const uint8_t* row = data + y*stride;
-        for (int x=0; x<w; ++x){
-            const uint8_t* p = row + x*bpp; // p[0]=B, p[1]=G, p[2]=R
-            histB[p[0]]++; histG[p[1]]++; histR[p[2]]++;
-        }
-    }
-    uint64_t total = (uint64_t)w*h;
-    double vb=0, vg=0, vr=0;
-    uint8_t tb = otsu_thresh(histB, total, &vb);
-    uint8_t tg = otsu_thresh(histG, total, &vg);
-    uint8_t tr = otsu_thresh(histR, total, &vr);
-    int ch = 0; uint8_t thr = tb; double vmax=vb;
-    if (vg>vmax){ ch=1; thr=tg; vmax=vg; }
-    if (vr>vmax){ ch=2; thr=tr; vmax=vr; }
-
-    // 2) 生成二值圖（白=255/黑=0），並統計黑白像素
-    std::vector<uint8_t> bw(w*h);
-    uint64_t black=0, white=0;
-    for (int y=0; y<h; ++y){
-        const uint8_t* row = data + y*stride;
-        for (int x=0; x<w; ++x){
-            const uint8_t* p = row + x*bpp;
-            uint8_t v = p[ch];
-            uint8_t pix = (v > thr) ? 255 : 0;
-            bw[y*w + x] = pix;
-            (pix==0 ? ++black : ++white);
-        }
-    }
-
-    // 3) 反相成「黑字白底」（Tesseract 比較吃這個）
-    if (black >= white){
-        for (auto& px : bw) px = 255 - px;
-    }
-
-    // 4) （可選）2× 放大，對小字很有感
-    const int W = w*2, H = h*2;
-    std::vector<uint8_t> up(W*H);
-    for (int y=0; y<H; ++y){
-        int sy = y>>1;
-        for (int x=0; x<W; ++x){
-            int sx = x>>1;
-            up[y*W + x] = bw[sy*w + sx];
-        }
-    }
-
-	Tess_api.SetImage(up.data(), W, H, 1, W);
-	Tess_api.SetSourceResolution(dpi * 2);
-	*/
-
-
 	Tess_api.SetSourceResolution(dpi);
 
 	// 設定為多行文字區塊
@@ -198,7 +129,7 @@ std::string ocr_from_xcb_data(uint8_t *data, int w, int h, int stride, int bpp, 
 
 
 
-void get_flame(xcb_connection_t *connection, xcb_screen_t *screen, xcb_rectangle_t *box, int dpi){
+void get_flame(xcb_connection_t *connection, xcb_screen_t *screen, xcb_rectangle_t *box, int dpi, int sockfd, struct sockaddr_in &server_address){
 
 	if (box->width == 0 || box->height == 0) return;
 
@@ -220,10 +151,16 @@ void get_flame(xcb_connection_t *connection, xcb_screen_t *screen, xcb_rectangle
 
 		std::string text = normalize_text(ocr_from_xcb_data(data, w, h, stride, bpp, dpi));
 		std::string result = gtrans(text, "zh-TW", "auto");
-		std::cout << "--------------------" << std::endl;
-		std::cout << text << std::endl;
-		std::cout << std::endl;
-		std::cout << result << std::endl;
+
+		std::ostringstream oss;
+		oss << "--------------------" << std::endl;
+		oss << text << std::endl;
+		oss << std::endl;
+		oss << result << std::endl;
+
+		std::string message = oss.str();
+
+		sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr *)&server_address, sizeof(server_address));
 	}
 	else {
 		fprintf(stderr, "Failed to get image\n");
@@ -233,10 +170,21 @@ void get_flame(xcb_connection_t *connection, xcb_screen_t *screen, xcb_rectangle
 
 
 
+void client (std::string &ip, int &port) {
+	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	struct sockaddr_in server_address;
 
-int main () {
+	memset(&server_address, 0, sizeof(server_address));
+	server_address.sin_family = AF_INET;
+	server_address.sin_port = htons(port);
+	inet_pton(AF_INET, ip.data(), &server_address.sin_addr);
 
-	if (Tess_api.Init(nullptr, "eng+chi_tra")) {return 0;}
+
+
+
+
+
+	if (Tess_api.Init(nullptr, "eng+chi_tra")) {return;}
 
 	int screen_number;
 	xcb_connection_t *connection;
@@ -260,7 +208,6 @@ int main () {
 		xcb_screen_t *target_screen = screen_it.data;
 		screen_width = target_screen->width_in_pixels;
 		screen_height = target_screen->height_in_pixels;
-		//std::cout << "    width:" << target_screen->width_in_pixels << "    height:" << target_screen->height_in_pixels << std::endl;
 		xcb_screen_next(&screen_it);
 	}
 	xcb_segment_t empty_line[2];
@@ -439,7 +386,7 @@ int main () {
 									xcb_clear_area(connection, 1, window, 0, 0, 0, 0);
 									xcb_flush(connection);
 									usleep(100000);	// 避免截到還沒更新的舊圖
-									get_flame(connection, screen, &temp_box, dpi);
+									get_flame(connection, screen, &temp_box, dpi, sockfd, server_address);
 									boxes.push_back(temp_box);
 									stage = 0;
 									break;
@@ -491,5 +438,70 @@ quit:
 	xcb_ungrab_keyboard(connection, XCB_CURRENT_TIME);
 	xcb_key_symbols_free(key_symbols);
 	xcb_disconnect(connection);
+	return;
+}
+
+
+void server (std::string &ip, int &port) {
+	int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+	int ip_reuse = 1;
+	if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &ip_reuse, sizeof(ip_reuse)) < 0) {return;}
+
+	struct sockaddr_in server_address, client_address;
+	socklen_t addr_len = sizeof(client_address);
+	memset(&server_address, 0, sizeof(server_address));
+	server_address.sin_family = AF_INET;
+	server_address.sin_port = htons(port);
+	inet_pton(AF_INET, ip.data(), &server_address.sin_addr);
+
+	if(bind(sockfd, (const struct sockaddr *)&server_address, sizeof(server_address)) < 0) {return;}
+
+
+	char buffer[4096];
+	while (1) {
+		int n = recvfrom(sockfd, buffer, 4096, 0, (struct sockaddr *)&client_address, &addr_len);
+
+		if (n < 0 ){
+			break;
+		}
+
+		buffer[n] = '\0';
+		std::cout << buffer;
+	}
+
+	close(sockfd);
+}
+
+
+
+
+int main (int argc, char *argv[]) {
+	cxxopts::Options options("FOT", "Frame OCR Translate");
+
+	options.add_options()
+		("s,server", "server模式")
+		("i, ip", "IP 地址", cxxopts::value<std::string>()->default_value("127.0.0.1"))
+		("p,port", "Port 號碼", cxxopts::value<int>()->default_value("8080"))
+		("h,help", "顯示幫助");
+
+	auto result = options.parse(argc, argv);
+
+	if (result.count("help")) {
+		std::cout << options.help() << "\n";
+		return 0;
+	}
+
+	auto ip   = result["ip"].as<std::string>();
+	int port  = result["port"].as<int>();
+
+	if (result.count("server")) {
+		std::cout << "啟動 Server 模式，IP = " << ip << " Port = " << port << "\n";
+		server(ip, port);
+	}
+	else {
+		std::cout << "啟動 Client 模式，目標IP = " << ip << " 目標Port = " << port << "\n";
+		client(ip, port);
+	}
+
 	return 0;
 }
