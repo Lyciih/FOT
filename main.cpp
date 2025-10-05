@@ -286,7 +286,7 @@ void client (std::string &ip, int &port) {
 	xcb_set_input_focus(connection, XCB_INPUT_FOCUS_PARENT, window, XCB_CURRENT_TIME);
 	xcb_flush(connection);
 
-
+/*
 	// 把鍵盤事件鎖定給自己，因為滑鼠點擊最左上角時會出現(1,1)座標，這時焦點會跳到未知的地方，讓esc鍵失效
 	{
 		xcb_grab_keyboard_cookie_t gck = xcb_grab_keyboard(connection, 0, window, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
@@ -296,6 +296,7 @@ void client (std::string &ip, int &port) {
 		}
 		free(grep);
 	}
+	*/
 
 
 

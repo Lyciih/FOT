@@ -1,3 +1,4 @@
+![示範畫面](images/present.png)
 # FOT
 Frame OCR Translate
 
