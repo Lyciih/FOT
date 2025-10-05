@@ -1,7 +1,6 @@
-![示範畫面](https://github.com/Lyciih/FOT/blob/main/images/present1.png)
 # FOT
+![示範畫面](https://github.com/Lyciih/FOT/blob/main/images/present1.png)
 Frame OCR Translate
-
 幀緩存光學辨識翻譯器
 
 ## instruction
