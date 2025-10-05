@@ -15,29 +15,29 @@ git clone https://github.com/Lyciih/FOT.git
 
 ### 2 編譯
 ```bash
-git make
+make
 ```
 
 ### 3 安裝
 ```bash
-git make install
+sudo make install
 ```
 
 
 ### 4 運行一個 server
 ```bash
-git fot -s 
+fot -s 
 ```
 
 
 ### 5 運行 client
 ```bash
-git fot
+fot
 ```
 
 ### 6 框選想要翻譯的詞或句子
 ```bash
-git fot
+fot
 ```
 
 ### 7 在server觀看結果
@@ -48,5 +48,5 @@ git fot
 
 ### 10 解除安裝
 ```bash
-git make uninstall
+sudo make uninstall
 ```
