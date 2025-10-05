@@ -8,8 +8,9 @@ Frame OCR Translate
 
 ## 使用方法
 
-1.
+- 1 clone
 ```bash
 git clone https://github.com/Lyciih/FOT.git
+```
 
-2.install
+- 2 install
