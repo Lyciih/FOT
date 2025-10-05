@@ -1,4 +1,4 @@
-FOT: main.cpp
+fot: main.cpp
 	g++ main.cpp -o fot -Wall -lxcb -lxcb-keysyms -ltesseract -llept
 
 .PHONY: clean run install uninstall
