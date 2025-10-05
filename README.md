@@ -1,4 +1,4 @@
-![示範畫面](images/present.png)
+![示範畫面](https://github.com/Lyciih/FOT/blob/main/images/present1.png)
 # FOT
 Frame OCR Translate
 
