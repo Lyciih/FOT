@@ -1,6 +1,6 @@
 
 # FOT
-Frame OCR Translate<br>幀緩存光學辨識翻譯器
+Frame OCR Translate - 幀緩存光學辨識翻譯器
 ![示範畫面](https://github.com/Lyciih/FOT/blob/main/images/present1.png)
 
 ## instruction
