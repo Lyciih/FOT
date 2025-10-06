@@ -15,15 +15,15 @@ git clone https://github.com/Lyciih/FOT.git
 
 ### 2 編譯
 要編譯跟正確運行fot，你需要先安裝依賴的library跟程式。
-- xcb
+- xcb    (x server 的視窗api)
 ```bash
 sudo apt install 
 ```
-- tesseract
+- tesseract    (光學辨識library)
 ```bash
 sudo apt install 
 ```
-- translate-shell
+- translate-shell    (終端機翻譯工具)
 ```bash
 sudo apt install 
 ```
@@ -33,7 +33,7 @@ make
 ```
 
 ### 3 安裝
-執行以下命令會把fot安裝在/usr/local/bin/底下，因此需要sudo。這會讓終端機的自動補全可以找到fot。
+執行以下命令會把編譯好的fot複製到/usr/local/bin/底下，因此需要sudo。這會讓終端機的自動補全可以找到fot。
 ```bash
 sudo make install
 ```
