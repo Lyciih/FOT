@@ -45,6 +45,7 @@ server會接收並顯示光學辨識跟翻譯結果。需要長時間閱讀文�
 fot -s 
 ```
 ![示範畫面2](https://github.com/Lyciih/FOT/blob/main/images/present2.png)
+
 可選參數:
 ```bash
 fot -s [server 模式] -ip [ip 地址] -p [port]
