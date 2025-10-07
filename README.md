@@ -44,7 +44,7 @@ fot -s
 
 參數:
 ```bash
-fot [-s, server模式] [-i, IP, 預設:127.0.0.1] [-p, port, 預設:8080]
+fot [-s, server模式] [-i, IP, 預設:127.0.0.1] [-p, port, 預設:8080] [-h, 幫助]
 ```
 
 
