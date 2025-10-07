@@ -286,7 +286,6 @@ void client (std::string &ip, int &port) {
 	xcb_set_input_focus(connection, XCB_INPUT_FOCUS_PARENT, window, XCB_CURRENT_TIME);
 	xcb_flush(connection);
 
-/*
 	// 把鍵盤事件鎖定給自己，因為滑鼠點擊最左上角時會出現(1,1)座標，這時焦點會跳到未知的地方，讓esc鍵失效
 	{
 		xcb_grab_keyboard_cookie_t gck = xcb_grab_keyboard(connection, 0, window, XCB_CURRENT_TIME, XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC);
@@ -296,7 +295,6 @@ void client (std::string &ip, int &port) {
 		}
 		free(grep);
 	}
-	*/
 
 
 
@@ -360,7 +358,6 @@ void client (std::string &ip, int &port) {
 						if (keysym == XK_Escape) {
 							switch (stage) {
 								case 0:
-
 									xcb_destroy_window(connection, window);
 									xcb_flush(connection);
 									free(event);
@@ -379,11 +376,10 @@ void client (std::string &ip, int &port) {
 						if (butten_press_event->detail == 1) {
 
 							//避免焦點移到其他視窗上回不來，導致無法離開client端
-							if(butten_press_event->event_x < 0 || butten_press_event->event_y < 0){exit(1);}
+							if(butten_press_event->event_x < 0 || butten_press_event->event_y < 0){std::cerr << "自動退出，滑鼠點擊座標有負數" << std::endl;goto quit;}
 
 							switch (stage) {
 								case 0:
-
 									begin.x = butten_press_event->event_x;
 									begin.y = butten_press_event->event_y;
 									stage = 1;
