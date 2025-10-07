@@ -16,17 +16,13 @@ git clone https://github.com/Lyciih/FOT.git
 ### 2 編譯
 要編譯跟正確運行fot，你需要先安裝依賴的library跟程式。
 - xcb    (x server 的視窗api)
-```bash
-sudo apt install 
-```
 - tesseract    (光學辨識library)
-```bash
-sudo apt install 
-```
 - translate-shell    (終端機翻譯工具)
 ```bash
-sudo apt install 
+sudo apt update
+sudo apt install libxcb1-dev libxcb-keysyms1-dev libtesseract-dev libleptonica-dev translate-shell
 ```
+
 然後執行
 ```bash
 make
