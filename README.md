@@ -64,6 +64,7 @@ fot
 ![示範畫面5](https://github.com/Lyciih/FOT/blob/main/images/present5.png)
 
 ### 9 按esc鍵退出client端
+如果滑鼠座標有小於0的部份也會自動退出，避免焦點移到其他視窗上回不來，導致無法離開client端。
 
 ### 10 按 ctrl + c 鍵關閉server
 

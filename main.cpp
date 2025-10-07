@@ -377,8 +377,13 @@ void client (std::string &ip, int &port) {
 						xcb_button_press_event_t *butten_press_event = (xcb_button_press_event_t*)event;
 
 						if (butten_press_event->detail == 1) {
+
+							//避免焦點移到其他視窗上回不來，導致無法離開client端
+							if(butten_press_event->event_x < 0 || butten_press_event->event_y < 0){exit(1);}
+
 							switch (stage) {
 								case 0:
+
 									begin.x = butten_press_event->event_x;
 									begin.y = butten_press_event->event_y;
 									stage = 1;
