@@ -34,39 +34,40 @@ make
 sudo make install
 ```
 
+### 4 可用參數
+```bash
+fot [-s, server模式] [-i, IP, 預設:127.0.0.1] [-p, port, 預設:8080] [-h, 幫助]
+```
 
-### 4 運行一個server
+
+### 5 運行一個server
 server會接收並顯示光學辨識跟翻譯結果。需要長時間閱讀文件或翻譯時，你可以開啟一個常駐在桌面上。
 ```bash
 fot -s 
 ```
 ![示範畫面2](https://github.com/Lyciih/FOT/blob/main/images/present2.png)
 
-參數:
-```bash
-fot [-s, server模式] [-i, IP, 預設:127.0.0.1] [-p, port, 預設:8080] [-h, 幫助]
-```
 
 
-### 5 運行 client
+### 6 運行 client
 在另一個終端執行，或是將命令加入自己桌面環境的快捷鍵中。尚未框選任何範圍時，會在桌面範圍顯示一個大的紅叉。
 ```bash
 fot
 ```
 ![示範畫面3](https://github.com/Lyciih/FOT/blob/main/images/present3.png)
 
-### 6 框選想要翻譯的詞或句子
+### 7 框選想要翻譯的詞或句子
 框選時，在起始位置按一下即可放開，接著滑鼠可以自由移動，決定好後再按第二下。如果起始位置選錯，可以按esc鍵取消，回到尚未選擇起始位置的狀態，此時若再按一次esc，則會退出client端。你可以連續框選。
 ![示範畫面4](https://github.com/Lyciih/FOT/blob/main/images/present4.png)
 
-### 7 在server觀看結果
+### 8 在server觀看結果
 ![示範畫面5](https://github.com/Lyciih/FOT/blob/main/images/present5.png)
 
-### 8 按esc鍵退出client端
+### 9 按esc鍵退出client端
 
-### 9 按 ctrl + c 鍵關閉server
+### 10 按 ctrl + c 鍵關閉server
 
-### 10 解除安裝
+### 11 解除安裝
 ```bash
 sudo make uninstall
 ```
