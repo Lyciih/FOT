@@ -42,9 +42,9 @@ fot -s
 ```
 ![示範畫面2](https://github.com/Lyciih/FOT/blob/main/images/present2.png)
 
-可選參數:
+參數:
 ```bash
-fot -s [server 模式] -ip [ip 地址] -p [port]
+fot -s(可選，server模式) [-i, IP, 預設:127.0.0.1] [-p, port, 預設:8080]
 ```
 
 
